@@ -9,6 +9,8 @@ This project fine-tunes the **[OpenAI GPT-OSS-20B](https://huggingface.co/openai
 We use the [CounselChat dataset](https://huggingface.co/datasets/nbertagnolli/counsel-chat), which contains anonymized therapist responses to user-submitted questions.  
 From this dataset we extract and filter **child/teen/parent/school-related questions**, clean them, and prepare them for **supervised fine-tuning (SFT)**.
 
+We also intend to draw more data from other sources to obtain a large breadth and depth of data that will amount to a noticeable change in base model behavior. 
+
 The end goal is to train a model that can respond in a supportive, therapist-like style **without making diagnoses or giving medical advice**.
 
 ---
@@ -34,7 +36,7 @@ Key libraries are:
 
 ## Running in Google Colab
 For non-technical collaborators:
-1. Open the notebook in Google Colab
+1. Open the notebook [in Google Colab](https://colab.research.google.com/)
     - File --> Open notebook --> GitHub --> paste repo URL
 2. Change runtime to GPU (for speed, not necessary)
     - Runtime --> Change runtime type --> "GPU"
