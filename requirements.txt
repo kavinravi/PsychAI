@@ -8,12 +8,17 @@ evaluate>=0.4.1
 safetensors>=0.4.3
 huggingface_hub>=0.23.0
 bitsandbytes>=0.43.0   # int8 path for LoRA
+google-generativeai>=0.7.0
+
 
 # ---------- essentials / utilities ----------
 numpy>=1.26
 pandas>=2.2
 tqdm>=4.66
 sentencepiece>=0.2.0   # some tokenizers still need it
+python-dotenv>=1.0.1
+tqdm>=4.66.3
+
 
 # ---------- notebooks & collaboration ----------
 ipykernel>=6.29

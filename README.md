@@ -18,9 +18,10 @@ The end goal is to train a model that can respond in a supportive, therapist-lik
 ## Data Preparation
 
 1. **Load Data**  - Load data from Huggingface, GitHub, or manually (sources in notebook)
-2. **Filter for child-related content** - apply a regex-based filter to keep only child-related keywords
+2. **Filter for adult content** - apply a regex-based filter to filter adult/inappropriate content
 3. **Scrub for PII** - scrub all personal details (emails, phone numbers, links, etc.)
 4. **Deduplicate** - remove duplicate data
+5. **Feed to LLM** - use an LLM to filter for ONLY child-related entries
 
 --- 
 
@@ -41,8 +42,14 @@ For non-technical collaborators:
 2. Change runtime to GPU (for speed, not necessary)
     - Runtime --> Change runtime type --> "GPU"
 3. Un-comment and run the install cell at the top of the notebook to install dependencies
-4. Run all data prep cells
-5. Run training (more details later)
+4. [DATA PREP ONLY] Go to [Google Cloud Console](https://console.cloud.google.com/projectcreate) and create a new project to obtain an API key
+4. [DATA PREP ONLY] Back in the Colab notebook, navigate to the sidebar, look for a key-shaped icon called "secrets", and enter the following:
+```bash
+GEMINI_API_KEY=sk-xxxxxxxxxxxxxxxx
+GEMINI_MODEL=gemini-2.0-flash
+```
+5. Run all data prep cells
+6. Run training (more details later)
 
 --- 
 
