@@ -1,0 +1,24 @@
+# ---------- core HF stack ----------
+transformers>=4.43.3
+peft>=0.12.0
+trl>=0.9.6
+accelerate>=0.33.0
+datasets>=2.19.0
+evaluate>=0.4.1
+safetensors>=0.4.3
+huggingface_hub>=0.23.0
+bitsandbytes>=0.43.0   # int8 path for LoRA
+
+# ---------- essentials / utilities ----------
+numpy>=1.26
+pandas>=2.2
+tqdm>=4.66
+sentencepiece>=0.2.0   # some tokenizers still need it
+
+# ---------- notebooks & collaboration ----------
+ipykernel>=6.29
+jupytext>=1.16
+nbdime>=4.0.2
+
+# have to install torch separately due to CUDA version
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
