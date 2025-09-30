@@ -30,47 +30,93 @@ st.set_page_config(
 # Custom CSS for chat interface
 st.markdown("""
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    .stApp {
+        font-family: 'Inter', sans-serif;
+    }
+    
     .chat-message {
-        padding: 1rem;
-        border-radius: 10px;
+        padding: 1.25rem;
+        border-radius: 12px;
         margin-bottom: 1rem;
         display: flex;
         flex-direction: column;
+        animation: slideIn 0.2s ease-out;
     }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
     .user-message {
-        background-color: #e3f2fd;
-        margin-left: 20%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        margin-left: 15%;
+        border: none;
     }
+    
     .assistant-message {
-        background-color: #f5f5f5;
-        margin-right: 20%;
+        background: #1e293b;
+        color: #f1f5f9;
+        margin-right: 15%;
+        border: 1px solid #334155;
     }
+    
     .message-role {
-        font-weight: bold;
-        margin-bottom: 0.5rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+        opacity: 0.9;
     }
+    
     .message-content {
-        line-height: 1.6;
+        line-height: 1.7;
+        font-size: 0.95rem;
     }
+    
     .message-timestamp {
         font-size: 0.75rem;
-        color: #999;
-        margin-top: 0.5rem;
+        opacity: 0.6;
+        margin-top: 0.75rem;
     }
+    
     .warning-banner {
-        background-color: #fff3cd;
-        padding: 1rem;
-        border-radius: 5px;
-        border-left: 4px solid #ffc107;
-        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        padding: 1.25rem;
+        border-radius: 12px;
+        color: #0f172a;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
     }
+    
     .info-banner {
-        background-color: #d1ecf1;
-        padding: 1rem;
-        border-radius: 5px;
-        border-left: 4px solid #17a2b8;
-        margin-bottom: 1rem;
+        background: #1e293b;
+        padding: 1.25rem;
+        border-radius: 12px;
+        border: 1px solid #334155;
+        color: #94a3b8;
+        margin-bottom: 1.5rem;
     }
+    
+    .chat-input-container {
+        position: sticky;
+        bottom: 0;
+        background: #0f172a;
+        padding: 1.5rem 0;
+        border-top: 1px solid #334155;
+    }
+    
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
