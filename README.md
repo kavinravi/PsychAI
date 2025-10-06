@@ -28,11 +28,11 @@ The end goal is to train a model that can respond in a supportive, therapist-lik
 --- 
 
 ## Training (more details later)
-Once data is ready, training is done using 8-bit LoRA on GPT-OSS-20b.
+Once data is ready, training is done using 8-bit LoRA on the LLM.
 Key libraries are:
 - Transformers
 - PEFT 
-- TRL
+- TRL 
 - bitsandbytes
 
 ---
