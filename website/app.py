@@ -162,10 +162,10 @@ def show_welcome_page():
                 <span>PsychAI</span>
             </div>
             <div class="nav-buttons">
-                <a href="?page=auth&tab=signin" style="text-decoration: none;">
+                <a href="?page=auth&tab=signin" target="_self" style="text-decoration: none;">
                     <button class="nav-btn nav-btn-secondary">Sign In</button>
                 </a>
-                <a href="?page=auth&tab=signup" style="text-decoration: none;">
+                <a href="?page=auth&tab=signup" target="_self" style="text-decoration: none;">
                     <button class="nav-btn nav-btn-primary">Create Account</button>
                 </a>
             </div>
