@@ -53,6 +53,9 @@ GEMINI_MODEL=gemini-2.0-flash
 5. Run all data prep cells
 6. Run training (more details later)
 
+## Access via Streamlit
+1. Visit the Streamlit website [here](https://psychchat.streamlit.app/)
+
 --- 
 
 ## Ethics & Safety
