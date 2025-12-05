@@ -52,6 +52,9 @@ GEMINI_MODEL=gemini-2.0-flash
 ## Access via Streamlit
 1. Visit the Streamlit website [here](https://psychchat.streamlit.app/)
 
+
+## Access the Finetuned Model
+1. Visit the Huggingface repo [here](https://huggingface.co/kavin-ravi/qwen3-8b-psychai-lora)
 --- 
 
 ## Ethics & Safety
