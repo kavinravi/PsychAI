@@ -1,17 +1,13 @@
 # CounselChat Child-Psych LoRA Project
 
-This project fine-tunes the **[Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)** model using **LoRA adapters (8-bit)** to specialize it as an "expert" in child psychology, based on counselor Q&A data. The ultimate objective is to create an LLM that specializes in, and can help with the rising issue of social anxiety in adolescents by creating a bridge between technology and society.
+This project fine-tunes the **[Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B)** model using **LoRA adapters (8-bit)** to specialize it as an "expert" in child/adolescent psychology, based on counselor Q&A data. The ultimate objective is to create an LLM that specializes in, and can help with the rising issue of social anxiety in adolescents by creating a bridge between technology and society.
 
 ---
 
 ## Overview
 
 We use the [CounselChat dataset](https://huggingface.co/datasets/nbertagnolli/counsel-chat), which contains anonymized therapist responses to user-submitted questions.  
-From this dataset we extract and filter **child/teen/parent/school-related questions**, clean them, and prepare them for **supervised fine-tuning (SFT)**.
-
-We also use the [HOPE dataset](https://github.com/LCS2-IIITD/SPARTA_WSDM2022/tree/main/HOPE_data), which provides longer interactions between therapists and patients, which will be similarly anonymized. 
-
-We also intend to draw more data from other sources to obtain a large breadth and depth of data that will amount to a noticeable change in base model behavior. 
+From this dataset we extract and filter child/teen/parent/school-related questions, clean them, and prepare them for supervised fine-tuning (SFT).
 
 The end goal is to train a model that can respond in a supportive, therapist-like style **without making diagnoses or giving medical advice**.
 
