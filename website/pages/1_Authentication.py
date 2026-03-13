@@ -188,20 +188,20 @@ def main():
         unsafe_allow_html=True,
     )
 
-    requested_tab = st.query_params.get("tab", "signin")
-    tab_labels = ["Sign In", "Create Account"]
-    default_idx = 1 if requested_tab == "signup" else 0
+    requested_tab = st.session_state.pop("_auth_tab", None) or st.query_params.get("tab", "signin")
 
-    if default_idx == 1:
-        tab2, tab1 = st.tabs(["Create Account", "Sign In"])
+    if requested_tab == "signup":
+        tab_signup, tab_signin = st.tabs(["Create Account", "Sign In"])
+        with tab_signup:
+            _show_signup()
+        with tab_signin:
+            _show_login()
     else:
-        tab1, tab2 = st.tabs(["Sign In", "Create Account"])
-
-    with tab1:
-        _show_login()
-
-    with tab2:
-        _show_signup()
+        tab_signin, tab_signup = st.tabs(["Sign In", "Create Account"])
+        with tab_signin:
+            _show_login()
+        with tab_signup:
+            _show_signup()
 
 
 def _google_button(label: str):
@@ -249,7 +249,17 @@ def _show_signup():
         email = st.text_input("Email", placeholder="you@example.com")
         pw = st.text_input("Password", type="password", placeholder="Min 8 characters")
         pw2 = st.text_input("Confirm Password", type="password", placeholder="Re-enter password")
-        agree = st.checkbox("I agree to the Terms of Service and Privacy Policy")
+
+        tos_c1, tos_c2 = st.columns([0.08, 0.92], vertical_alignment="center")
+        with tos_c1:
+            agree = st.checkbox(" ", key="agree_tos", label_visibility="collapsed")
+        with tos_c2:
+            st.markdown(
+                'I agree to the <a href="/Terms_of_Service" target="_blank" '
+                'style="color:#a78bfa;text-decoration:underline;">Terms of Service</a>',
+                unsafe_allow_html=True,
+            )
+
         submit = st.form_submit_button("Create Account", use_container_width=True, type="primary")
 
         if submit:

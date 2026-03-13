@@ -409,6 +409,7 @@ def show_welcome_page():
     st.markdown(MESH_BG, unsafe_allow_html=True)
 
     if st.query_params.get("page") == "auth":
+        st.session_state["_auth_tab"] = st.query_params.get("tab", "signin")
         st.switch_page("pages/1_Authentication.py")
 
     st.markdown(f"""
@@ -428,7 +429,7 @@ def show_welcome_page():
             <div class="hero-brand">Fr<span class="ai">AI</span>nd.ly</div>
             <h1>A safe space to <em>talk.</em></h1>
             <p class="hero-sub">
-                An AI companion designed to support teens through anxiety,
+                An AI companion designed to support young adults through anxiety,
                 stress, and everyday challenges. No judgment — just understanding.
             </p>
             <div class="hero-cta">
