@@ -6,359 +6,511 @@ Main Streamlit Application Entry Point
 import streamlit as st
 from utils.auth import check_authentication, logout_user
 
-# Page configuration
 st.set_page_config(
-    page_title="PsychAI - Child Psychology Assistant",
+    page_title="PsychAI",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# Modern CSS styling
-st.markdown("""
-    <style>
-    /* Import Google Font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
-    /* Global styles */
-    .stApp {
-        font-family: 'Inter', sans-serif;
-    }
-    
-    /* Top navigation bar */
-    .nav-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 1rem 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        z-index: 1000;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    
-    .nav-logo {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: white;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .nav-buttons {
-        display: flex;
-        gap: 1rem;
-    }
-    
-    /* Add top padding to main content */
-    .main .block-container {
-        padding-top: 5rem;
-    }
-    
-    /* Hero section */
-    .hero {
-        text-align: center;
-        padding: 3rem 0;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-    
-    .hero-title {
-        font-size: 3.5rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 1rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1.25rem;
-        color: #94a3b8;
-        margin-bottom: 2rem;
-        line-height: 1.6;
-    }
-    
-    /* Feature cards */
-    .feature-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 2rem;
-        margin: 3rem 0;
-    }
-    
-    .feature-card {
-        background: #1e293b;
-        border-radius: 12px;
-        padding: 2rem;
-        border: 1px solid #334155;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    .feature-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-        border-color: #6366f1;
-    }
-    
-    .feature-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .feature-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #f1f5f9;
-        margin-bottom: 0.5rem;
-    }
-    
-    .feature-desc {
-        color: #94a3b8;
-        line-height: 1.6;
-    }
-    
-    /* Warning box */
-    .warning-card {
-        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-        border-radius: 12px;
-        padding: 1.5rem;
-        color: #0f172a;
-        margin: 2rem 0;
-    }
-    
-    .warning-card strong {
-        font-weight: 600;
-    }
-    
-    /* Hide Streamlit branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    </style>
-""", unsafe_allow_html=True)
+GLOBAL_CSS = """<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+.stApp {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+#MainMenu, footer, header { visibility: hidden; }
+.stDeployButton { display: none !important; }
+[data-testid="stSidebar"] { display: none !important; }
+[data-testid="stHeader"] { display: none !important; }
+
+.main .block-container {
+    padding: 0 !important;
+    max-width: 100% !important;
+}
+
+/* ---------- animated background mesh ---------- */
+.mesh-wrap {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: -1;
+    pointer-events: none;
+}
+.mesh-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(150px);
+    opacity: 0.10;
+}
+.mesh-blob.purple {
+    width: 650px; height: 650px;
+    background: #8b5cf6;
+    top: -18%; right: -8%;
+    animation: drift1 18s ease-in-out infinite;
+}
+.mesh-blob.blue {
+    width: 500px; height: 500px;
+    background: #3b82f6;
+    bottom: -12%; left: -6%;
+    animation: drift2 22s ease-in-out infinite;
+}
+.mesh-blob.teal {
+    width: 400px; height: 400px;
+    background: #06b6d4;
+    top: 45%; left: 45%;
+    animation: drift3 20s ease-in-out infinite;
+}
+@keyframes drift1 {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33%     { transform: translate(40px,-60px) scale(1.1); }
+    66%     { transform: translate(-30px,40px) scale(.95); }
+}
+@keyframes drift2 {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33%     { transform: translate(-50px,30px) scale(1.05); }
+    66%     { transform: translate(40px,-40px) scale(.9); }
+}
+@keyframes drift3 {
+    0%,100% { transform: translate(-50%,-50%) scale(1); }
+    33%     { transform: translate(-45%,-55%) scale(1.1); }
+    66%     { transform: translate(-55%,-45%) scale(.9); }
+}
+
+/* ---------- nav ---------- */
+.nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 999;
+    padding: 1rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    background: rgba(8,9,13,0.6);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.nav-brand {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fafafa;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.nav-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+    line-height: 1.4;
+}
+.btn-ghost {
+    background: transparent;
+    color: #a1a1aa;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.btn-ghost:hover {
+    color: #fafafa;
+    border-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.04);
+}
+.btn-primary {
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    color: #fff !important;
+    border: none;
+    font-weight: 600;
+}
+.btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px -5px rgba(139,92,246,0.35);
+}
+
+/* ---------- hero ---------- */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 7rem 2rem 4rem;
+    position: relative;
+}
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1.1rem;
+    border-radius: 100px;
+    border: 1px solid rgba(139,92,246,0.2);
+    background: rgba(139,92,246,0.06);
+    color: #a78bfa;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    margin-bottom: 2.5rem;
+}
+.hero-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #8b5cf6;
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+    0%,100% { opacity: 1; }
+    50%     { opacity: 0.3; }
+}
+.hero h1 {
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+    margin: 0 0 1.5rem;
+    color: #fafafa;
+    max-width: 720px;
+}
+.hero h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #a78bfa, #818cf8, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+    font-size: 1.15rem;
+    color: #71717a;
+    max-width: 500px;
+    line-height: 1.7;
+    margin: 0 auto 2.5rem;
+}
+.hero-cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.hero-cta .btn {
+    padding: 0.7rem 1.75rem;
+    font-size: 0.95rem;
+}
+.scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #3f3f46;
+    animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50%     { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ---------- sections ---------- */
+.section {
+    padding: 5rem 2rem 6rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.section-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #8b5cf6;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+}
+.section-title {
+    font-size: clamp(1.75rem, 3vw, 2.4rem);
+    font-weight: 700;
+    color: #fafafa;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+}
+.section-desc {
+    font-size: 1.05rem;
+    color: #71717a;
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+}
+
+/* ---------- feature cards ---------- */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+@media (max-width: 700px) {
+    .features-grid { grid-template-columns: 1fr; }
+}
+.f-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+.f-card:hover {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(139,92,246,0.2);
+    transform: translateY(-2px);
+}
+.f-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(139,92,246,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    color: #a78bfa;
+}
+.f-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #e4e4e7;
+    margin: 0 0 0.5rem;
+}
+.f-card p {
+    font-size: 0.9rem;
+    color: #71717a;
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* ---------- notice ---------- */
+.notice {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 5rem;
+}
+.notice-card {
+    background: rgba(250,204,21,0.03);
+    border: 1px solid rgba(250,204,21,0.1);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+.notice-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+.notice-card p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #a1a1aa;
+    line-height: 1.65;
+}
+.notice-card strong { color: #e4e4e7; }
+
+/* ---------- footer ---------- */
+.site-footer {
+    border-top: 1px solid rgba(255,255,255,0.04);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    color: #3f3f46;
+    font-size: 0.8rem;
+}
+
+/* ---------- streamlit button overrides ---------- */
+.stButton > button {
+    font-family: 'Inter', sans-serif !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+.stButton > button:hover {
+    transform: translateY(-1px) !important;
+}
+
+/* ---------- dashboard (auth'd landing) ---------- */
+.dash-hero {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 7rem 2rem 4rem;
+}
+.dash-hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: #fafafa;
+    margin: 0 0 1rem;
+}
+.dash-hero h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #a78bfa, #818cf8, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.dash-hero p {
+    font-size: 1.1rem;
+    color: #71717a;
+    margin-bottom: 2.5rem;
+}
+</style>"""
+
+MESH_BG = """
+<div class="mesh-wrap">
+    <div class="mesh-blob purple"></div>
+    <div class="mesh-blob blue"></div>
+    <div class="mesh-blob teal"></div>
+</div>"""
+
+SVG_TARGET = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'
+SVG_LOCK = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>'
+SVG_HEART = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
+SVG_CLOCK = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>'
+SVG_ARROW = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>'
+
 
 def main():
-    # Check if user is authenticated
     auth_status = check_authentication()
-    
     if not auth_status["authenticated"]:
         show_welcome_page()
     else:
         show_main_app(auth_status)
 
+
 def show_welcome_page():
-    """Display welcome page for unauthenticated users"""
-    
-    # Top navigation bar with inline buttons using query params
-    st.markdown("""
-        <div class="nav-container">
-            <div class="nav-logo">
-                <span>🧠</span>
-                <span>PsychAI</span>
-            </div>
-            <div class="nav-buttons">
-                <a href="?page=auth&tab=signin" target="_self" style="text-decoration: none;">
-                    <button class="nav-btn nav-btn-secondary">Sign In</button>
-                </a>
-                <a href="?page=auth&tab=signup" target="_self" style="text-decoration: none;">
-                    <button class="nav-btn nav-btn-primary">Create Account</button>
-                </a>
-            </div>
-        </div>
-        
-        <style>
-        .nav-btn {
-            padding: 0.5rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .nav-btn-secondary {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        
-        .nav-btn-secondary:hover {
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .nav-btn-primary {
-            background: white;
-            color: #667eea;
-            border: none;
-            font-weight: 600;
-        }
-        
-        .nav-btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    
-    # Check if we should redirect to auth page
-    query_params = st.query_params
-    if query_params.get("page") == "auth":
+    st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
+    st.markdown(MESH_BG, unsafe_allow_html=True)
+
+    if st.query_params.get("page") == "auth":
         st.switch_page("pages/1_Authentication.py")
-    
-    # Hero section
-    st.markdown("""
+
+    st.markdown(f"""
+        <div class="nav">
+            <div class="nav-brand">🧠 PsychAI</div>
+            <div class="nav-actions">
+                <a href="?page=auth&tab=signin" target="_self" class="btn btn-ghost">Sign in</a>
+                <a href="?page=auth&tab=signup" target="_self" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+
         <div class="hero">
-            <h1 class="hero-title">AI-Powered Child Psychology Support</h1>
-            <p class="hero-subtitle">
-                A specialized assistant designed to provide empathetic, evidence-based guidance 
-                for child and adolescent mental health concerns.
+            <div class="hero-badge">
+                <span class="dot"></span>
+                AI-Powered Mental Health Support
+            </div>
+            <h1>A safe space<br>to <em>talk.</em></h1>
+            <p class="hero-sub">
+                An AI companion designed to support teens through anxiety,
+                stress, and everyday challenges. No judgment — just understanding.
             </p>
+            <div class="hero-cta">
+                <a href="?page=auth&tab=signup" target="_self" class="btn btn-primary">Get Started</a>
+                <a href="#about" class="btn btn-ghost">Learn more ↓</a>
+            </div>
+            <div class="scroll-hint">{SVG_ARROW}</div>
+        </div>
+
+        <div class="section" id="about">
+            <div class="section-label">Why PsychAI</div>
+            <div class="section-title">Built for the moments that matter</div>
+            <div class="section-desc">
+                Whether it's school stress, social pressure, or just needing
+                someone to listen — PsychAI is here for you, anytime.
+            </div>
+            <div class="features-grid">
+                <div class="f-card">
+                    <div class="f-icon">{SVG_TARGET}</div>
+                    <h3>Specialized Support</h3>
+                    <p>Trained on child psychology and family counseling data
+                       to provide age-appropriate, evidence-based guidance.</p>
+                </div>
+                <div class="f-card">
+                    <div class="f-icon">{SVG_LOCK}</div>
+                    <h3>Private &amp; Secure</h3>
+                    <p>Your conversations stay yours. Encrypted, secure, and
+                       never shared with anyone.</p>
+                </div>
+                <div class="f-card">
+                    <div class="f-icon">{SVG_HEART}</div>
+                    <h3>Empathetic Guidance</h3>
+                    <p>Warm, therapist-like responses designed to validate your
+                       feelings — never diagnose or prescribe.</p>
+                </div>
+                <div class="f-card">
+                    <div class="f-icon">{SVG_CLOCK}</div>
+                    <h3>Always Available</h3>
+                    <p>24/7 access to mental health support, whenever you need
+                       someone to talk to.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="notice">
+            <div class="notice-card">
+                <span class="notice-icon">⚠️</span>
+                <p>
+                    <strong>Important:</strong> PsychAI provides supportive guidance
+                    only and does not replace professional mental health services.
+                    If you or someone you know is in crisis, please contact your
+                    local emergency services or the
+                    <strong>988 Suicide &amp; Crisis Lifeline</strong> (call or text 988).
+                </p>
+            </div>
+        </div>
+
+        <div class="site-footer">
+            PsychAI · Built with care for those who need it most
         </div>
     """, unsafe_allow_html=True)
-    
-    # Features (with proper markdown parsing)
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.markdown("""
-            <div class="feature-card">
-                <div class="feature-icon">🎯</div>
-                <div class="feature-title">Specialized Support</div>
-                <div class="feature-desc">
-                    Trained on child psychology and family counseling data to provide 
-                    age-appropriate, evidence-based guidance.
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-            <div class="feature-card">
-                <div class="feature-icon">🔒</div>
-                <div class="feature-title">Private & Secure</div>
-                <div class="feature-desc">
-                    Your conversations are confidential, encrypted, and stored securely. 
-                    We take your privacy seriously.
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown("""
-            <div class="feature-card">
-                <div class="feature-icon">💙</div>
-                <div class="feature-title">Empathetic Guidance</div>
-                <div class="feature-desc">
-                    Supportive, therapist-like responses designed to help without 
-                    providing diagnoses or medical advice.
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    with col4:
-        st.markdown("""
-            <div class="feature-card">
-                <div class="feature-icon">⏰</div>
-                <div class="feature-title">Always Available</div>
-                <div class="feature-desc">
-                    Access mental health support 24/7, whenever you need someone to talk to 
-                    about your concerns.
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    # Important notice
-    st.markdown("""
-        <div class="warning-card">
-            <strong>⚠️ Important Notice:</strong><br>
-            This AI assistant provides supportive guidance only and does not replace professional 
-            mental health services. In case of emergency or crisis, please contact your local 
-            emergency services or crisis hotline (US: 988).
-        </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+
 
 def show_main_app(auth_status):
-    """Display main application for authenticated users"""
-    
-    # Top navigation bar for authenticated users
+    st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
+    st.markdown(MESH_BG, unsafe_allow_html=True)
+
     st.markdown(f"""
-        <div class="top-nav">
-            <div class="nav-logo">
-                <span>🧠</span>
-                <span>PsychAI</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 1rem; color: white;">
-                <span style="opacity: 0.9;">Welcome, {auth_status['name']}</span>
+        <div class="nav">
+            <div class="nav-brand">🧠 PsychAI</div>
+            <div class="nav-actions">
+                <span style="color:#71717a;font-size:0.875rem;">Hey, {auth_status['name']}</span>
             </div>
         </div>
+
+        <div class="dash-hero">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                Welcome back
+            </div>
+            <h1>Ready to <em>talk?</em></h1>
+            <p>Pick up where you left off, or start a new conversation.</p>
+        </div>
     """, unsafe_allow_html=True)
-    
-    st.markdown('<div class="main-content">', unsafe_allow_html=True)
-    
-    # Sidebar
-    with st.sidebar:
-        st.title("Navigation")
-        
-        if st.button("🏠 Home", use_container_width=True):
-            st.switch_page("app.py")
-        if st.button("💬 Chat with AI", use_container_width=True, type="primary"):
+
+    col1, col2, col3 = st.columns([2, 3, 2])
+    with col2:
+        if st.button("💬  Start Chatting", use_container_width=True, type="primary"):
             st.switch_page("pages/2_Chat.py")
-        
-        st.markdown("---")
-        
-        st.markdown("### Account")
-        st.info(f"📧 {auth_status['email']}")
-        
-        if st.button("🚪 Logout", use_container_width=True):
+
+        st.markdown("<div style='height:0.75rem'></div>", unsafe_allow_html=True)
+
+        if st.button("🚪  Logout", use_container_width=True):
             logout_user()
             st.rerun()
-    
-    # Main dashboard content
-    st.markdown("""
-        <div class="hero">
-            <h1 class="hero-title">Welcome Back!</h1>
-            <p class="hero-subtitle">
-                How can I support you today?
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-            <div class="feature-card">
-                <div class="feature-icon">💬</div>
-                <div class="feature-title">Start a Conversation</div>
-                <div class="feature-desc">
-                    Connect with our AI assistant for child and adolescent mental health support.
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("Start Chatting →", use_container_width=True, type="primary"):
-            st.switch_page("pages/2_Chat.py")
-    
-    with col2:
-        st.markdown("""
-            <div class="feature-card">
-                <div class="feature-icon">📚</div>
-                <div class="feature-title">About This Project</div>
-                <div class="feature-desc">
-                    PsychAI uses advanced language models fine-tuned on counseling data.
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+
 
 if __name__ == "__main__":
     main()

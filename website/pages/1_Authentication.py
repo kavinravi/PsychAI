@@ -7,264 +7,269 @@ import streamlit as st
 import sys
 from pathlib import Path
 
-# Add parent directory to path to import utils
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from utils.auth import (
-    create_user, 
-    authenticate_user, 
-    login_user, 
+    create_user,
+    authenticate_user,
+    login_user,
     check_authentication,
-    get_google_oauth_url
+    get_google_oauth_url,
 )
 
 st.set_page_config(
-    page_title="Authentication - PsychAI",
-    page_icon="🔐",
-    layout="centered"
+    page_title="Sign in — PsychAI",
+    page_icon="🧠",
+    layout="centered",
 )
 
-# Modern CSS
-st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
-    .stApp {
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .auth-container {
-        max-width: 450px;
-        margin: 2rem auto;
-        padding: 2.5rem;
-        background: #1e293b;
-        border-radius: 16px;
-        border: 1px solid #334155;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-    }
-    
-    .auth-header {
-        font-size: 2rem;
-        font-weight: 700;
-        text-align: center;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0.5rem;
-    }
-    
-    .auth-subheader {
-        text-align: center;
-        color: #94a3b8;
-        margin-bottom: 2rem;
-        font-size: 0.95rem;
-    }
-    
-    .google-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        width: 100%;
-        padding: 12px 24px;
-        background: white;
-        color: #1f2937;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        font-weight: 500;
-        font-size: 15px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    
-    .google-btn:hover {
-        background: #f9fafb;
-        border-color: #d1d5db;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    
-    .google-logo {
-        width: 20px;
-        height: 20px;
-    }
-    
-    .divider {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        margin: 2rem 0;
-        color: #64748b;
-        font-size: 0.875rem;
-    }
-    
-    .divider::before,
-    .divider::after {
-        content: '';
-        flex: 1;
-        border-bottom: 1px solid #334155;
-    }
-    
-    .divider:not(:empty)::before {
-        margin-right: 1rem;
-    }
-    
-    .divider:not(:empty)::after {
-        margin-left: 1rem;
-    }
-    
-    /* Hide Streamlit branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    </style>
-""", unsafe_allow_html=True)
+st.markdown("""<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+.stApp { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+#MainMenu, footer, header { visibility: hidden; }
+.stDeployButton { display: none !important; }
+[data-testid="stSidebar"] { display: none !important; }
+[data-testid="stHeader"] { display: none !important; }
+
+/* mesh background */
+.mesh-wrap {
+    position: fixed; inset: 0; overflow: hidden;
+    z-index: -1; pointer-events: none;
+}
+.mesh-blob {
+    position: absolute; border-radius: 50%;
+    filter: blur(150px); opacity: 0.10;
+}
+.mesh-blob.purple {
+    width: 500px; height: 500px; background: #8b5cf6;
+    top: -15%; right: -10%;
+    animation: d1 18s ease-in-out infinite;
+}
+.mesh-blob.blue {
+    width: 400px; height: 400px; background: #3b82f6;
+    bottom: -10%; left: -8%;
+    animation: d2 22s ease-in-out infinite;
+}
+@keyframes d1 {
+    0%,100% { transform: translate(0,0); }
+    50%     { transform: translate(30px,-40px); }
+}
+@keyframes d2 {
+    0%,100% { transform: translate(0,0); }
+    50%     { transform: translate(-40px,30px); }
+}
+
+/* back link */
+.back-link {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    color: #71717a; font-size: 0.85rem; text-decoration: none;
+    margin-bottom: 2rem; transition: color 0.2s;
+}
+.back-link:hover { color: #a1a1aa; }
+
+/* auth card */
+.auth-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 440px;
+    margin: 3rem auto 2rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.auth-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #fafafa;
+    text-align: center;
+    margin-bottom: 0.3rem;
+}
+.auth-sub {
+    text-align: center;
+    color: #71717a;
+    font-size: 0.92rem;
+    margin-bottom: 2rem;
+}
+
+/* google button */
+.g-btn {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; width: 100%; padding: 0.7rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; color: #e4e4e7;
+    font-weight: 500; font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none !important;
+}
+.g-btn:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.18);
+}
+.g-btn.disabled {
+    opacity: 0.4; cursor: not-allowed;
+    pointer-events: none;
+}
+.g-logo { width: 18px; height: 18px; }
+
+/* divider */
+.or-divider {
+    display: flex; align-items: center;
+    margin: 1.75rem 0; color: #3f3f46;
+    font-size: 0.8rem;
+}
+.or-divider::before, .or-divider::after {
+    content: ''; flex: 1;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.or-divider:not(:empty)::before { margin-right: 1rem; }
+.or-divider:not(:empty)::after  { margin-left: 1rem; }
+
+/* streamlit overrides */
+.stButton > button {
+    font-family: 'Inter', sans-serif !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+}
+.stTextInput > div > div > input {
+    border-radius: 10px !important;
+}
+.stTabs [data-baseweb="tab-list"] {
+    gap: 0;
+    justify-content: center;
+}
+.stTabs [data-baseweb="tab"] {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    padding: 0.6rem 1.5rem;
+}
+</style>""", unsafe_allow_html=True)
+
+GOOGLE_SVG = """<svg class="g-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+</svg>"""
+
 
 def main():
-    # Check if already authenticated
+    st.markdown("""
+        <div class="mesh-wrap">
+            <div class="mesh-blob purple"></div>
+            <div class="mesh-blob blue"></div>
+        </div>
+    """, unsafe_allow_html=True)
+
     auth_status = check_authentication()
     if auth_status["authenticated"]:
-        st.success(f"✅ Already logged in as {auth_status['name']}")
+        st.markdown('<div class="auth-card">', unsafe_allow_html=True)
+        st.success(f"Already signed in as **{auth_status['name']}**")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("Go to Home", use_container_width=True):
+            if st.button("← Home", use_container_width=True):
                 st.switch_page("app.py")
         with col2:
-            if st.button("Go to Chat", use_container_width=True, type="primary"):
+            if st.button("Chat →", use_container_width=True, type="primary"):
                 st.switch_page("pages/2_Chat.py")
+        st.markdown("</div>", unsafe_allow_html=True)
         return
-    
-    st.markdown('<div class="auth-header">Welcome Back</div>', unsafe_allow_html=True)
-    st.markdown('<div class="auth-subheader">Sign in to access PsychAI</div>', unsafe_allow_html=True)
-    
-    # Tab selection for Login vs Sign Up
-    tab1, tab2 = st.tabs(["Sign In", "Create Account"])
-    
-    with tab1:
-        show_login_form()
-    
-    with tab2:
-        show_signup_form()
 
-def show_login_form():
-    """Display login form"""
-    
-    # Google OAuth option
-    google_oauth_url = get_google_oauth_url()
-    
-    if google_oauth_url:
-        st.markdown("""
-            <a href="{}" style="text-decoration: none;">
-                <div class="google-btn">
-                    <svg class="google-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                    </svg>
-                    <span>Continue with Google</span>
-                </div>
-            </a>
-        """.format(google_oauth_url), unsafe_allow_html=True)
+    st.markdown("""
+        <a href="/" target="_self" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to home
+        </a>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="auth-card">', unsafe_allow_html=True)
+    st.markdown('<div class="auth-title">Welcome</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="auth-sub">Sign in to start chatting with PsychAI</div>',
+        unsafe_allow_html=True,
+    )
+
+    tab1, tab2 = st.tabs(["Sign In", "Create Account"])
+
+    with tab1:
+        _show_login()
+
+    with tab2:
+        _show_signup()
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def _google_button(label: str):
+    url = get_google_oauth_url()
+    if url:
+        st.markdown(
+            f'<a href="{url}" class="g-btn">{GOOGLE_SVG}<span>{label}</span></a>',
+            unsafe_allow_html=True,
+        )
     else:
-        st.markdown("""
-            <div class="google-btn" style="opacity: 0.5; cursor: not-allowed;">
-                <svg class="google-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                <span>Continue with Google (Setup Required)</span>
-            </div>
-        """, unsafe_allow_html=True)
-        st.caption("ℹ️ Google Sign-In will be available once OAuth is configured.")
-    
-    st.markdown('<div class="divider">OR</div>', unsafe_allow_html=True)
-    
-    # Email/Password login
+        st.markdown(
+            f'<div class="g-btn disabled">{GOOGLE_SVG}<span>{label} (not configured)</span></div>',
+            unsafe_allow_html=True,
+        )
+
+
+def _show_login():
+    _google_button("Continue with Google")
+    st.markdown('<div class="or-divider">or</div>', unsafe_allow_html=True)
+
     with st.form("login_form"):
         email = st.text_input("Email", placeholder="you@example.com")
-        password = st.text_input("Password", type="password", placeholder="Enter your password")
+        password = st.text_input("Password", type="password", placeholder="Your password")
         submit = st.form_submit_button("Sign In", use_container_width=True, type="primary")
-        
+
         if submit:
             if not email or not password:
-                st.error("❌ Please enter both email and password")
+                st.error("Please enter both email and password.")
             else:
-                success, message, name = authenticate_user(email, password)
-                
-                if success:
+                ok, msg, name = authenticate_user(email, password)
+                if ok:
                     login_user(email, name, "custom")
-                    st.success(f"✅ {message}")
-                    st.balloons()
+                    st.success(msg)
                     st.rerun()
                 else:
-                    st.error(f"❌ {message}")
+                    st.error(msg)
 
-def show_signup_form():
-    """Display signup form"""
-    
-    # Google OAuth option
-    google_oauth_url = get_google_oauth_url()
-    
-    if google_oauth_url:
-        st.markdown("""
-            <a href="{}" style="text-decoration: none;">
-                <div class="google-btn">
-                    <svg class="google-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                    </svg>
-                    <span>Sign up with Google</span>
-                </div>
-            </a>
-        """.format(google_oauth_url), unsafe_allow_html=True)
-    else:
-        st.markdown("""
-            <div class="google-btn" style="opacity: 0.5; cursor: not-allowed;">
-                <svg class="google-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                <span>Sign up with Google (Setup Required)</span>
-            </div>
-        """, unsafe_allow_html=True)
-        st.caption("ℹ️ Google Sign-Up will be available once OAuth is configured.")
-    
-    st.markdown('<div class="divider">OR</div>', unsafe_allow_html=True)
-    
-    # Email/Password signup
+
+def _show_signup():
+    _google_button("Sign up with Google")
+    st.markdown('<div class="or-divider">or</div>', unsafe_allow_html=True)
+
     with st.form("signup_form"):
-        name = st.text_input("Full Name", placeholder="John Doe")
+        name = st.text_input("Full Name", placeholder="Jane Doe")
         email = st.text_input("Email", placeholder="you@example.com")
-        password = st.text_input("Password", type="password", placeholder="Minimum 8 characters")
-        password_confirm = st.text_input("Confirm Password", type="password", placeholder="Re-enter password")
-        
-        agree_terms = st.checkbox("I agree to the Terms of Service and Privacy Policy")
-        
+        pw = st.text_input("Password", type="password", placeholder="Min 8 characters")
+        pw2 = st.text_input("Confirm Password", type="password", placeholder="Re-enter password")
+        agree = st.checkbox("I agree to the Terms of Service and Privacy Policy")
         submit = st.form_submit_button("Create Account", use_container_width=True, type="primary")
-        
+
         if submit:
-            # Validation
-            if not all([name, email, password, password_confirm]):
-                st.error("❌ Please fill in all fields")
-            elif password != password_confirm:
-                st.error("❌ Passwords do not match")
-            elif not agree_terms:
-                st.error("❌ Please agree to the Terms of Service")
+            if not all([name, email, pw, pw2]):
+                st.error("Please fill in all fields.")
+            elif pw != pw2:
+                st.error("Passwords do not match.")
+            elif not agree:
+                st.error("Please agree to the Terms of Service.")
             else:
-                success, message = create_user(email, password, name)
-                
-                if success:
-                    st.success(f"✅ {message}")
-                    st.info("👉 Please sign in using the 'Sign In' tab")
-                    st.balloons()
+                ok, msg = create_user(email, pw, name)
+                if ok:
+                    st.success(msg)
+                    st.info("Switch to the **Sign In** tab to log in.")
                 else:
-                    st.error(f"❌ {message}")
+                    st.error(msg)
+
 
 if __name__ == "__main__":
     main()
