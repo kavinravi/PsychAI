@@ -69,16 +69,11 @@ st.markdown("""<style>
 }
 .back-link:hover { color: #a1a1aa; }
 
-/* auth card */
-.auth-card {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 20px;
-    padding: 2.5rem;
-    max-width: 440px;
-    margin: 3rem auto 2rem;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+/* center the main content area and constrain width */
+.main .block-container {
+    max-width: 480px !important;
+    margin: 0 auto;
+    padding: 2rem 1.5rem !important;
 }
 .auth-title {
     font-size: 1.75rem;
@@ -167,7 +162,6 @@ def main():
 
     auth_status = check_authentication()
     if auth_status["authenticated"]:
-        st.markdown('<div class="auth-card">', unsafe_allow_html=True)
         st.success(f"Already signed in as **{auth_status['name']}**")
         col1, col2 = st.columns(2)
         with col1:
@@ -176,7 +170,6 @@ def main():
         with col2:
             if st.button("Chat →", use_container_width=True, type="primary"):
                 st.switch_page("pages/2_Chat.py")
-        st.markdown("</div>", unsafe_allow_html=True)
         return
 
     st.markdown("""
@@ -189,7 +182,6 @@ def main():
         </a>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="auth-card">', unsafe_allow_html=True)
     st.markdown('<div class="auth-title">Welcome</div>', unsafe_allow_html=True)
     st.markdown(
         '<div class="auth-sub">Sign in to start chatting with PsychAI</div>',
@@ -203,8 +195,6 @@ def main():
 
     with tab2:
         _show_signup()
-
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def _google_button(label: str):

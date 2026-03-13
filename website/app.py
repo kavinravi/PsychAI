@@ -150,8 +150,10 @@ GLOBAL_CSS = """<style>
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 7rem 2rem 4rem;
+    padding: 4rem 2rem 6rem;
+    padding-top: calc(4rem + 56px);
     position: relative;
+    margin-top: -5vh;
 }
 .hero-badge {
     display: inline-flex;
@@ -177,20 +179,31 @@ GLOBAL_CSS = """<style>
     0%,100% { opacity: 1; }
     50%     { opacity: 0.3; }
 }
-.hero h1 {
-    font-size: clamp(3rem, 6vw, 5.5rem);
+.hero-brand {
+    font-size: clamp(4rem, 9vw, 7.5rem);
     font-weight: 800;
-    letter-spacing: -0.045em;
-    line-height: 1.05;
-    margin: 0 0 1.5rem;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin: 0 0 0.75rem;
     color: #fafafa;
+}
+.hero-brand .ai {
+    background: linear-gradient(135deg, #a78bfa, #818cf8, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.hero h1 {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin: 0 0 1.5rem;
+    color: #a1a1aa;
     max-width: 720px;
 }
 .hero h1 em {
     font-style: normal;
-    background: linear-gradient(135deg, #a78bfa, #818cf8, #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #d4d4d8;
 }
 .hero-sub {
     font-size: 1.15rem;
@@ -412,7 +425,8 @@ def show_welcome_page():
                 <span class="dot"></span>
                 AI-Powered Mental Health Support
             </div>
-            <h1>A safe space<br>to <em>talk.</em></h1>
+            <div class="hero-brand">Fr<span class="ai">AI</span>nd.ly</div>
+            <h1>A safe space to <em>talk.</em></h1>
             <p class="hero-sub">
                 An AI companion designed to support teens through anxiety,
                 stress, and everyday challenges. No judgment — just understanding.
