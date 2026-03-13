@@ -60,6 +60,8 @@ def create_user_db(email: str, password_hash: str, salt: str, name: str, auth_me
         result = client.table("users").insert(data).execute()
         return True
     except Exception as e:
+        import streamlit as _st
+        _st.error(f"DB error: {e}")
         print(f"Error creating user: {e}")
         return False
 

@@ -188,7 +188,14 @@ def main():
         unsafe_allow_html=True,
     )
 
-    tab1, tab2 = st.tabs(["Sign In", "Create Account"])
+    requested_tab = st.query_params.get("tab", "signin")
+    tab_labels = ["Sign In", "Create Account"]
+    default_idx = 1 if requested_tab == "signup" else 0
+
+    if default_idx == 1:
+        tab2, tab1 = st.tabs(["Create Account", "Sign In"])
+    else:
+        tab1, tab2 = st.tabs(["Sign In", "Create Account"])
 
     with tab1:
         _show_login()
