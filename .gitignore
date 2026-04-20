@@ -61,7 +61,10 @@ Thumbs.db
 *.pth
 *.bin
 *.ckpt
+*.safetensors
 checkpoint-*/
 runs/
 wandb/
 outputs/
+merged-psychai/
+psychai-lora-out/

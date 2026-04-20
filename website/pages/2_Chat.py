@@ -245,7 +245,7 @@ def main():
     st.markdown("""
         <div class="status-badge">
             <span class="status-dot"></span>
-            Development mode — placeholder responses
+            PsychAI · Qwen3-8B fine-tune
         </div>
     """, unsafe_allow_html=True)
 

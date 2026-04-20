@@ -134,83 +134,33 @@ def delete_chat(user_email: str, chat_id: str):
 
 def get_llm_response(user_message: str, conversation_history: List[Dict]) -> str:
     """
-    Get response from the fine-tuned LLM
-    
-    This is a placeholder function. You'll replace this with actual model inference
-    once your fine-tuned model is ready.
-    
-    Args:
-        user_message: The user's current message
-        conversation_history: List of previous messages in the conversation
-    
-    Returns:
-        The LLM's response as a string
-    """
-    # TODO: Replace this placeholder with actual model inference
-    # For now, return a helpful placeholder message
-    
-    placeholder_responses = [
-        "I understand you're reaching out for support. While I'm still being set up, "
-        "I want you to know that your feelings are valid and it's brave of you to seek help. "
-        "Once our system is fully configured, I'll be able to provide more personalized guidance.",
-        
-        "Thank you for sharing that with me. I'm currently in development mode, but I want "
-        "to acknowledge what you've expressed. In the meantime, if you're experiencing a crisis, "
-        "please reach out to a trusted adult or call a crisis helpline.",
-        
-        "I hear you, and I appreciate you opening up. My AI capabilities are still being "
-        "configured, but I want you to know that seeking support is an important step. "
-        "Remember, there are always people who care and want to help.",
-    ]
-    
-    # Simple logic to vary responses
-    import random
-    response = random.choice(placeholder_responses)
-    
-    return response
+    Get a reply from the fine-tuned PsychAI model (Qwen3-8B + LoRA on HF Hub).
 
-def load_model_placeholder():
+    Args:
+        user_message: The user's latest message.
+        conversation_history: Prior messages in the same chat (excluding the
+            new user message).
+
+    Returns:
+        The model's response text.
     """
-    Placeholder function for loading the fine-tuned model
-    
-    Once your model is trained, you'll implement this function to:
-    1. Load the base model and LoRA adapters
-    2. Set up the tokenizer
-    3. Configure generation parameters
-    
-    Example implementation (for later):
-    ```python
-    from transformers import AutoTokenizer, AutoModelForCausalLM
-    from peft import PeftModel
-    
-    base_model = "Qwen/Qwen2.5-7B-Instruct"
-    adapter_path = "path/to/your/lora/adapters"
-    
-    tokenizer = AutoTokenizer.from_pretrained(base_model)
-    model = AutoModelForCausalLM.from_pretrained(base_model, device_map="auto")
-    model = PeftModel.from_pretrained(model, adapter_path)
-    
-    return model, tokenizer
-    ```
-    """
-    return None, None
+    try:
+        from .model_inference import generate_reply
+        return generate_reply(user_message, conversation_history)
+    except Exception as e:
+        print(f"[chat_handler] Model inference failed: {type(e).__name__}: {e}")
+        return (
+            "I'm having trouble reaching the model right now. Please try again in a moment. "
+            "If this keeps happening, let the team know — and remember, if you're in crisis "
+            "you can call or text **988** for immediate support."
+        )
+
 
 def format_conversation_for_model(messages: List[Dict]) -> str:
-    """
-    Format conversation history for model input
-    
-    Args:
-        messages: List of message dictionaries with 'role' and 'content'
-    
-    Returns:
-        Formatted string ready for model input
-    """
-    # This will depend on your model's chat template
-    # For now, a simple format
+    """Simple text rendering of a conversation (used for logging/debugging)."""
     formatted = ""
     for msg in messages:
-        role = msg["role"]
-        content = msg["content"]
+        role = msg.get("role", "user")
+        content = msg.get("content", "")
         formatted += f"{role.capitalize()}: {content}\n"
-    
     return formatted

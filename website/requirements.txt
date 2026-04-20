@@ -1,0 +1,23 @@
+# Runtime deps for the PsychAI Streamlit app.
+# Inference is delegated to Hugging Face (Inference Providers / Endpoints), so
+# torch / peft / bitsandbytes intentionally do NOT appear here — Streamlit
+# Cloud doesn't have a GPU and the merged model lives on the Hub.
+
+# ---------- web ----------
+streamlit>=1.31.0
+streamlit-authenticator>=0.3.1
+
+# ---------- HF inference client ----------
+huggingface_hub>=0.27.0
+
+# ---------- auth ----------
+google-auth>=2.27.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+
+# ---------- database ----------
+supabase>=2.3.0
+psycopg2-binary>=2.9.9
+
+# ---------- misc ----------
+python-dotenv>=1.0.1
